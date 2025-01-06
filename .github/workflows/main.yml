@@ -1,0 +1,58 @@
+name: Compose App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        branch:
+          - main
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Cache Gradle Wrapper
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-wrapper-
+      - name: Cache Gradle Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle*', '**/gradle.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-caches-
+      - name: Build APK
+        run: |
+          if [ "${{ matrix.branch }}" == "main" ]; then
+            ./gradlew assembleRelease
+          elif [ "${{ matrix.branch }}" == "uat" ]; then
+            ./gradlew assembleDebug
+          fi
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.branch }}-debug-apk
+          path: |
+            app/build/outputs/apk/main/debug/*.apk
+            app/build/outputs/apk/main/debug/*.apk
