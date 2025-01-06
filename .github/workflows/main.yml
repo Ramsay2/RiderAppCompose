@@ -53,15 +53,8 @@ jobs:
             ./gradlew assembleDebug --no-daemon --stacktrace
           fi
 
-      # Step 6: Optimize APK (Optional but recommended)
-      - name: Optimize APK
-        run: |
-          ZIPALIGN_PATH=$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/zipalign
-          $ZIPALIGN_PATH -v 4 app/app-release-unsigned.apk app/app-release-aligned.apk
-          APKSIGNER_PATH=$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/apksigner
-          $APKSIGNER_PATH sign --ks my-release-key.jks --out app/app-release-signed.apk app/app-release-aligned.apk
 
-      # Step 7: Upload APK
+      # Step 6: Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
