@@ -28,10 +28,15 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = rootProject.file("keystore")
-            keyAlias = "sachin"
-            keyPassword = "sachinsharma"
-            storePassword = "sachinsharma"
+            keyAlias = System.getenv("KEY_ALIAS")
+                ?: project.findProperty("android.injected.signing.key.alias") as String?
+            keyPassword = System.getenv("KEY_PASSWORD")
+                ?: project.findProperty("android.injected.signing.key.password") as String?
+            storeFile = System.getenv("KEYSTORE_FILE")?.let { file(it) }
+                ?: project.findProperty("android.injected.signing.store.file")
+                    ?.let { file(it as String) }
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+                ?: project.findProperty("android.injected.signing.store.password") as String?
         }
     }
 
