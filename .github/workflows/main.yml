@@ -1,4 +1,4 @@
-name: Compose App
+name: Build Compose App
 
 on:
   push:
@@ -12,15 +12,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        branch:
-          - main
-
     steps:
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # Step 2: Set up JDK
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -28,6 +25,7 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      # Step 3: Cache Gradle Wrapper
       - name: Cache Gradle Wrapper
         uses: actions/cache@v3
         with:
@@ -35,6 +33,8 @@ jobs:
           key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-wrapper-
+
+      # Step 4: Cache Gradle Dependencies
       - name: Cache Gradle Dependencies
         uses: actions/cache@v3
         with:
@@ -42,15 +42,28 @@ jobs:
           key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle*', '**/gradle.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-caches-
+
+      # Step 5: Build APK
       - name: Build APK
         run: |
-          if [ "${{ matrix.branch }}" == "main" ]; then
-            ./gradlew assembleRelease
-          elif [ "${{ matrix.branch }}" == "uat" ]; then
-            ./gradlew assembleDebug
+          ./gradlew clean
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            ./gradlew assembleRelease --no-daemon --stacktrace
+          elif [ "${{ github.ref_name }}" == "uat" ]; then
+            ./gradlew assembleDebug --no-daemon --stacktrace
           fi
+
+      # Step 6: Optimize APK (Optional but recommended)
+      - name: Optimize APK
+        run: |
+          ZIPALIGN_PATH=$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/zipalign
+          $ZIPALIGN_PATH -v 4 app/app-release-unsigned.apk app/app-release-aligned.apk
+          APKSIGNER_PATH=$ANDROID_HOME/build-tools/$(ls $ANDROID_HOME/build-tools | tail -1)/apksigner
+          $APKSIGNER_PATH sign --ks my-release-key.jks --out app/app-release-signed.apk app/app-release-aligned.apk
+
+      # Step 7: Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.branch }}-debug-apk
+          name: ${{ github.ref_name }}-apk
           path: app
