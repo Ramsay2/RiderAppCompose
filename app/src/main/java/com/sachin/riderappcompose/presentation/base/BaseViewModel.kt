@@ -8,7 +8,6 @@ import org.json.JSONObject
 import retrofit2.Response
 
 
-@HiltViewModel
 abstract class BaseViewModel(
     val domainHelper: DomainHelper
 ) : ViewModel() {

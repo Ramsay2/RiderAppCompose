@@ -1,6 +1,5 @@
 package com.sachin.riderappcompose.presentation.auth_screen
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.apnamart.apnarider.core_app_framework.logger.AppLogger
 import com.apnamart.apnarider.domain.DomainHelper
