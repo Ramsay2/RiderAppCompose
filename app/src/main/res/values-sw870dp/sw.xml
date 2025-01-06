@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+	<!-- Positive Dimensions -->
+	<dimen name="_1DP">2.4dp</dimen>
+	<dimen name="_2DP">4.8dp</dimen>
+	<dimen name="_4DP">9.7dp</dimen>
+	<dimen name="_6DP" tools:keep="@dimen/_6DP">14.5dp</dimen>
+	<dimen name="_8DP">19.3dp</dimen>
+	<dimen name="_10DP" tools:keep="@dimen/_10DP">24.2dp</dimen>
+	<dimen name="_12DP">29.0dp</dimen>
+	<dimen name="_14DP" tools:keep="@dimen/_14DP">33.8dp</dimen>
+	<dimen name="_16DP">38.7dp</dimen>
+	<dimen name="_18DP" tools:keep="@dimen/_18DP">43.5dp</dimen>
+	<dimen name="_24DP">58.0dp</dimen>
+	<dimen name="_36DP">87.0dp</dimen>
+	<dimen name="_32DP">77.3dp</dimen>
+	<dimen name="_20DP">48.3dp</dimen>
+	<dimen name="_48DP">116.0dp</dimen>
+	<dimen name="_72DP">174.0dp</dimen>
+	<dimen name="_80DP">193.3dp</dimen>
+	<dimen name="_90DP">217.5dp</dimen>
+	<dimen name="_92DP">222.3dp</dimen>
+	<dimen name="_100DP">241.7dp</dimen>
+	<dimen name="_180DP">435.0dp</dimen>
+	<dimen name="_60DP">145.0dp</dimen>
+	<dimen name="_240DP">580.0dp</dimen>
+	<dimen name="_190DP">459.2dp</dimen>
+	<dimen name="_120DP">290.0dp</dimen>
+	<dimen name="_140DP">338.3dp</dimen>
+	<dimen name="_160DP">386.7dp</dimen>
+	<!-- Positive Text Dimensions -->
+	<dimen name="_1SP" tools:keep="@dimen/_1SP">2.4sp</dimen>
+	<dimen name="_6SP">14.5sp</dimen>
+	<dimen name="_8SP">19.3sp</dimen>
+	<dimen name="_10SP">24.2sp</dimen>
+	<dimen name="_12SP">29.0sp</dimen>
+	<dimen name="_14SP">33.8sp</dimen>
+	<dimen name="_16SP">38.7sp</dimen>
+	<dimen name="_18SP" tools:keep="@dimen/_18SP">43.5sp</dimen>
+	<dimen name="_20SP">48.3sp</dimen>
+	<dimen name="_22SP" tools:keep="@dimen/_22SP">53.2sp</dimen>
+	<dimen name="_24SP">58.0sp</dimen>
+	<dimen name="_30SP" tools:keep="@dimen/_30SP">72.5sp</dimen>
+	<dimen name="_32SP" tools:keep="@dimen/_32SP">77.3sp</dimen>
+	<dimen name="_34SP">82.2sp</dimen>
+	<dimen name="_36SP" tools:keep="@dimen/_36SP">87.0sp</dimen>
+	<dimen name="_48SP">116.0sp</dimen>
+	<dimen name="_64SP">154.7sp</dimen>
+	<dimen name="_96SP">232.0sp</dimen>
+</resources>
