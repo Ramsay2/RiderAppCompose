@@ -42,26 +42,37 @@ jobs:
           key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle*', '**/gradle.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-caches-
-
-      # Step 5: Build Signed APK
-      - name: Build Signed APK
-#        env:
-#          KEYSTORE_FILE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-#          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-#          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-#          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-
-        run: |          
-          # Build the APK
+            
+              # Step 5: Build APK
+      - name: Build APK
+        run: |
           ./gradlew clean
           if [ "${{ github.ref_name }}" == "main" ]; then
             ./gradlew assembleRelease --no-daemon --stacktrace
-#              -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
-#              -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
-#              -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
-#              -Pandroid.injected.signing.key.password=$KEY_PASSWORD
           elif [ "${{ github.ref_name }}" == "uat" ]; then
             ./gradlew assembleDebug --no-daemon --stacktrace
           fi
+
+
+      # Step 5: Build Signed APK
+    #      - name: Build Signed APK
+    #        env:
+    #          KEYSTORE_FILE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+    #          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+    #          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+    #          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
+    #        run: |
+    #          # Build the APK
+    #          ./gradlew clean
+    #          if [ "${{ github.ref_name }}" == "main" ]; then
+    #            ./gradlew assembleRelease --no-daemon --stacktrace
+    #              -Pandroid.injected.signing.store.file=$KEYSTORE_FILE \
+    #              -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
+    #              -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
+    #              -Pandroid.injected.signing.key.password=$KEY_PASSWORD
+    #          elif [ "${{ github.ref_name }}" == "uat" ]; then
+    #            ./gradlew assembleDebug --no-daemon --stacktrace
+    #          fi
 
     
