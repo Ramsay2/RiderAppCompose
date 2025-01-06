@@ -18,11 +18,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Setup JDK
-      - name: Set up JDK 17
+        # Step 2: Set up JDK
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
 
       # Decode the keystore file
       - name: Decode and save keystore file
