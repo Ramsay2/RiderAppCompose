@@ -54,5 +54,5 @@ jobs:
         with:
           name: ${{ matrix.branch }}-debug-apk
           path: |
-            app/build/outputs/apk/main/debug/*.apk
-            app/build/outputs/apk/main/debug/*.apk
+            app/*.apk
+            app/*.apk
