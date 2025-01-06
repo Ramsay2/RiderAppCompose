@@ -57,7 +57,8 @@ jobs:
           # Build the APK
           ./gradlew clean
           if [ "${{ github.ref_name }}" == "main" ]; then
-            ./gradlew assembleRelease --no-daemon --stacktrace -Pandroid.injected.signing.store.file=release.keystore \
+            ./gradlew assembleRelease --no-daemon --stacktrace \
+              -Pandroid.injected.signing.store.file=release.keystore \
               -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
               -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
               -Pandroid.injected.signing.key.password=$KEY_PASSWORD
