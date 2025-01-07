@@ -56,10 +56,10 @@ jobs:
       - name: Build signed APK
         run: |
           ./gradlew assembleRelease \
-          -Pandroid.injected.signing.store.file="${secrets.KEYSTORE_FILE }" \
-          -Pandroid.injected.signing.store.password="${secrets.KEYSTORE_PASSWORD }" \
-          -Pandroid.injected.signing.key.alias="${secrets.KEY_ALIAS }" \
-          -Pandroid.injected.signing.key.password="${secrets.KEY_PASSWORD }"
+          -Pandroid.injected.signing.store.file=${secrets.KEYSTORE_FILE } \
+          -Pandroid.injected.signing.store.password=${secrets.KEYSTORE_PASSWORD } \
+          -Pandroid.injected.signing.key.alias=${secrets.KEY_ALIAS } \
+          -Pandroid.injected.signing.key.password=${secrets.KEY_PASSWORD }
 
 #      # Upload APK to Firebase App Distribution
 #      - name: Upload APK to Firebase App Distribution
