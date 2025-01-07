@@ -31,8 +31,8 @@ jobs:
         run: |
           mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
           mv app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
+
       - name: Sign App
-        if: ${{ steps.regex-match.outputs.match != '' }}
         id: sign_app
         uses: ilharp/sign-android-release@v1.0.4
         with:
@@ -51,6 +51,12 @@ jobs:
           mention-new-contributors: false
           include-compare: false
           semver: false
+
+      - name: Zip Files
+        uses: papeloto/action-zip@v1
+        with:
+          files: ${{ steps.releaseAab.outputs.aabfile }} ${{ steps.releaseApk.outputs.apkfile }}
+          dest: ${{ steps.releaseApk.outputs.apkfile }}.zip
 
       - name: Create Release
         if: ${{ steps.regex-match.outputs.match != '' }}
