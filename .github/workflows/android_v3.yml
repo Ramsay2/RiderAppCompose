@@ -34,7 +34,8 @@ jobs:
           keyPassword: ${{ secrets.KEY_PASSWORD }}
         run: |
           ./gradlew assembleRelease
-          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore app_keystore.jks -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEY_PASSWORD }} app/build/outputs/apk/release/app-release-unsigned.apk ${{ secrets.KEY_ALIAS }}
+          jarsigner -keystore app_keystore.jks -storepass ${{ secrets.KEY_PASSWORD }} -keypass ${{ secrets.KEYSTORE_PASSWORD }} app.jar ${{ secrets.KEY_ALIAS }}
+#          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore app_keystore.jks -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEY_PASSWORD }} app/build/outputs/apk/release/app-release-unsigned.apk ${{ secrets.KEY_ALIAS }}
           zipalign -v 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release.apk
 
       - name: Upload APK
