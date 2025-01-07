@@ -28,7 +28,7 @@ jobs:
 
       # Decode the keystore file
       - name: Decode and save keystore file
-        run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > keystore.jks
+        run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app_keystore.jks
 
       # Cache Gradle dependencies
       - name: Cache Gradle dependencies
@@ -55,9 +55,9 @@ jobs:
       # Build signed APK
       - name: Build signed APK
         env:
-          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: ./gradlew assembleRelease
 
           # Step 6: Upload APK
