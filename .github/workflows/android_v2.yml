@@ -37,19 +37,29 @@ jobs:
         run: |
           ./gradlew assembleRelease
 
-      # Sign the APK
-      - name: Sign APK
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: |
-          jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
-                    -keystore app_keystore.jks \
-                    -storepass $KEYSTORE_PASSWORD \
-                    -keypass $KEY_PASSWORD \
-                    app/build/outputs/apk/release/app-release-unsigned.apk \
-                    $KEY_ALIAS
+#      # Sign the APK
+#      - name: Sign APK
+#        env:
+#          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+#          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+#          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+#        run: |
+#          jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
+#                    -keystore app_keystore.jks \
+#                    -storepass $KEYSTORE_PASSWORD \
+#                    -keypass $KEY_PASSWORD \
+#                    app/build/outputs/apk/release/app-release-unsigned.apk \
+#                    $KEY_ALIAS
+
+      - name: Sign App
+        id: sign_app
+        uses: ilharp/sign-android-release@v1.0.4
+        with:
+          releaseDirectory: app/build/outputs/apk/release/app-release-unsigned.apk
+          signingKeyBase64: ${{ secrets.KEYSTORE_FILE }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
 
       # Align the APK
       - name: Align APK
