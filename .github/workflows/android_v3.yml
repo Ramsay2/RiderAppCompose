@@ -64,13 +64,13 @@ jobs:
           files: ${{ steps.releaseAab.outputs.aabfile }} ${{ steps.releaseApk.outputs.apkfile }}
           dest: ${{ steps.releaseApk.outputs.apkfile }}.zip
 
-      - name: Create Release
-        if: ${{ steps.regex-match.outputs.match != '' }}
-        id: create_release
-        uses: ncipollo/release-action@v1.13.0
-        with:
-          artifacts: "app/build/outputs/app-release-signed.aab, app/build/outputs/app-release-signed.apk"
-          body: ${{ steps.changelog.outputs.changelog }}
-          tag: ${{ github.event.head_commit.message }}
-          name: Release ${{ github.event.head_commit.message }}
-          token: ${{ secrets.TOKEN }}
+#      - name: Create Release
+#        if: ${{ steps.regex-match.outputs.match != '' }}
+#        id: create_release
+#        uses: ncipollo/release-action@v1.13.0
+#        with:
+#          artifacts: "app/build/outputs/app-release-signed.aab, app/build/outputs/app-release-signed.apk"
+#          body: ${{ steps.changelog.outputs.changelog }}
+#          tag: ${{ github.event.head_commit.message }}
+#          name: Release ${{ github.event.head_commit.message }}
+#          token: ${{ secrets.TOKEN }}
