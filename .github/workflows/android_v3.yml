@@ -18,9 +18,15 @@ jobs:
       - name: Setup JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
+
+      - name: Set up Android SDK
+        uses: actions/setup-android@v3
+        with:
+          api-level: 34
+          build-tools: '34'
 
       - name: Build App
         run: |
