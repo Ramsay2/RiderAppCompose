@@ -3,10 +3,10 @@ name: Production Builds
 on:
   push:
     branches:
-      - dev
+      - main
   pull_request:
     branches:
-      - dev
+      - main
 
 jobs:
   build:
@@ -28,10 +28,12 @@ jobs:
       # This will decode the keystore from base 64 text representation that we have stored in secrets
       # and generates and keystore file and gets stored in /android-app path
       - name: Decode Keystore
-        env:
+        with:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "34"
 
         run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app_keystore.jks
 
