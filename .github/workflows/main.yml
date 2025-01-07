@@ -66,7 +66,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ github.ref_name }}-apk
-          path: app
+          path: app/build/outputs/apk/release
 
 #          -Pandroid.injected.signing.store.file=${secrets.KEYSTORE_FILE } \
 #          -Pandroid.injected.signing.store.password=${secrets.KEYSTORE_PASSWORD } \
