@@ -1,76 +1,44 @@
-name: Build
+name: Android Release
+
 on:
   push:
     branches:
-      - 'main'
+      - main
+
 jobs:
-  Build:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - uses: kaisugi/action-regex-match@v1.0.0
-        id: regex-match
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          text: ${{ github.event.head_commit.message }}
-          regex: '^v[0-9]+\.[0-9]+\.[0-9]+$'
+          distribution: 'zulu'
+          java-version: 17
 
-      - name: Setup JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
 
-      - name: Set up Android SDK
-        uses: actions/setup-android@v3
-        with:
-          api-level: 34
-          build-tools: '34'
+      - name: Build with Gradle
+        run: ./gradlew build
 
-      - name: Build App
-        run: |
-          bash ./gradlew assembleRelease
-          bash ./gradlew bundleRelease
-      - name: Move files
-        if: ${{ steps.regex-match.outputs.match != '' }}
-        run: |
-          mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/app-release.apk
-          mv app/build/outputs/bundle/release/app-release.aab app/build/outputs/app-release.aab
-
-      - name: Sign App
-        id: sign_app
-        uses: ilharp/sign-android-release@v1.0.4
-        with:
-          releaseDir: app/build/outputs
-          signingKey: ${{ secrets.KEYSTORE_FILE }}
-          keyAlias: ${{ secrets.KEY_ALIAS }}
+      - name: Sign APK
+        env:
+          releaseDirectory: app/build/outputs/apk/release
+          signingKeyBase64: ${{ secrets.KEYSTORE_FILE }}
+          alias: ${{ secrets.KEY_ALIAS }}
           keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew assembleRelease
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore $KEYSTORE_FILE app/build/outputs/apk/release/app-release-unsigned.apk $KEY_ALIAS
+          zipalign -v 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release.apk
 
-      - name: Build Changelog
-        if: ${{ steps.regex-match.outputs.match != '' }}
-        id: changelog
-        uses: ardalanamini/auto-changelog@v3
+      - name: Upload APK
+        uses: actions/upload-artifact@v2
         with:
-          mention-authors: false
-          mention-new-contributors: false
-          include-compare: false
-          semver: false
-
-      - name: Zip Files
-        uses: papeloto/action-zip@v1
-        with:
-          files: ${{ steps.releaseAab.outputs.aabfile }} ${{ steps.releaseApk.outputs.apkfile }}
-          dest: ${{ steps.releaseApk.outputs.apkfile }}.zip
-
-#      - name: Create Release
-#        if: ${{ steps.regex-match.outputs.match != '' }}
-#        id: create_release
-#        uses: ncipollo/release-action@v1.13.0
-#        with:
-#          artifacts: "app/build/outputs/app-release-signed.aab, app/build/outputs/app-release-signed.apk"
-#          body: ${{ steps.changelog.outputs.changelog }}
-#          tag: ${{ github.event.head_commit.message }}
-#          name: Release ${{ github.event.head_commit.message }}
-#          token: ${{ secrets.TOKEN }}
+          name: app-release.apk
+          path: app/build/outputs/apk/release/app-release.apk
