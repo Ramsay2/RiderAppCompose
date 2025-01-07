@@ -54,12 +54,11 @@ jobs:
 
       # Build signed APK
       - name: Build signed APK
-        run: ./gradlew assembleRelease
-
         env:
           SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: ./gradlew assembleRelease
 
           # Step 6: Upload APK
       - name: Upload APK
