@@ -33,9 +33,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
 
-        run: |
-          echo $KEY_ALIAS > keystore-b64.txt
-          base64 -d keystore-b64.txt > app_keystore.jks
+        run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app_keystore.jks
 
       - name: Build Release apk
         env:
