@@ -37,6 +37,10 @@ jobs:
         env:
             BUILD_TOOLS_VERSION: "34"
 
+      - name: Sign APK
+        run: |
+          jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 app_keystore app-release-unsigned.apk ${{ secrets.KEY_ALIAS }}
+          zipalign -v 4 app-release-unsigned.apk app-release.apk
 
       - name: Get release file apk path
         id: releaseApk
