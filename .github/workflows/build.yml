@@ -49,16 +49,6 @@ jobs:
       - name: Build APK
         run: ./gradlew assembleRelease
 
-#      - name: Sign APK
-#        env:
-#          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-#          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-#          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-#        run: |
-#          jarsigner -verbose -keystore keystore.jks \
-#            -storepass $KEYSTORE_PASSWORD -keypass $KEY_PASSWORD \
-#            app/build/outputs/apk/release/app-release-unsigned.apk $KEY_ALIAS
-
       - name: Sign APK
         run: |
          $ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner sign --ks keystore.jks \
@@ -66,14 +56,6 @@ jobs:
          --key-pass pass:${{ secrets.KEY_PASSWORD }} \
          --out app/build/outputs/apk/release/app-release-signed.apk \
          app/build/outputs/apk/release/app-release-unsigned.apk
-
-
-#      - name: Optimize APK
-#        run: |
-#            export ANDROID_SDK_ROOT=$HOME/android-sdk
-#            export PATH=$ANDROID_SDK_ROOT/build-tools/34.0.0:$PATH
-#            zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk \
-#              app/build/outputs/apk/release/app-release.apk
 
       - name: Align APK
         run: |
@@ -85,4 +67,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: signed-apk
-          path: app/build/outputs/apk/release
+          path: app/build/outputs/apk/release/app-release-signed.apk
