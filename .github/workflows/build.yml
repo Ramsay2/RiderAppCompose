@@ -14,7 +14,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up cache for Gradle
+      - name: Cache Gradle
+        id: gradle-cache
         uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
@@ -22,7 +23,8 @@ jobs:
           restore-keys: |
             gradle-cache-${{ runner.os }}-
 
-      - name: Set up cache for Android SDK
+      - name: Cache Android SDK
+        id: android-sdk-cache
         uses: actions/cache@v3
         with:
           path: $HOME/android-sdk
@@ -37,6 +39,7 @@ jobs:
           java-version: '17'
 
       - name: Set up Android SDK
+        if: steps.android-sdk-cache.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends wget unzip
