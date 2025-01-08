@@ -37,6 +37,13 @@ jobs:
             export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/34.0.0:$PATH
             yes | sdkmanager --licenses
             sdkmanager "platform-tools" "build-tools;34.0.0"
+          
+      - name: Add Build Tools to PATH
+        run: |
+         echo "Adding build tools to PATH"
+         export ANDROID_SDK_ROOT=$HOME/android-sdk
+         export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/34.0.0:$PATH
+         echo "Build tools path: $PATH"
 
       # Step 3: Decode and save keystore
       - name: Decode and save keystore
@@ -63,8 +70,10 @@ jobs:
       # Step 6: Align the APK
       - name: Optimize APK
         run: |
-          zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk \
-            app/build/outputs/apk/release/app-release.apk
+            export ANDROID_SDK_ROOT=$HOME/android-sdk
+            export PATH=$ANDROID_SDK_ROOT/build-tools/34.0.0:$PATH
+            zipalign -v -p 4 app/build/outputs/apk/release/app-release-unsigned.apk \
+              app/build/outputs/apk/release/app-release.apk
 
       # Step 7: Upload APK as artifact
       - name: Upload APK
