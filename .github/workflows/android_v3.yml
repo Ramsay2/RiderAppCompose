@@ -38,7 +38,7 @@ jobs:
           -keystore app_keystore.jks \
           -storepass ${{ secrets.KEYSTORE_PASSWORD }} \ 
           -keypass ${{ secrets.KEY_PASSWORD }} \
-          -keyalias  ${{ secrets.KEY_ALIAS }} \
+          -alias  ${{ secrets.KEY_ALIAS }} \
           app/build/outputs/apk/release/app-release-unsigned.apk 
           zipalign -v 4 app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/app-release.apk
 
