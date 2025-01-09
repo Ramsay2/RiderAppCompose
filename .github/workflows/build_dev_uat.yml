@@ -1,0 +1,147 @@
+name: Build Signed APK
+
+on:
+  push:
+    branches:
+      - dev
+      - uat
+  pull_request:
+    branches:
+      - dev
+      - uat
+
+jobs:
+  build:
+    name: Build Signed APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Cache Gradle
+        id: gradle-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: gradle-cache-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-cache-${{ runner.os }}-
+
+      - name: Cache Android SDK
+        id: android-sdk-cache
+        uses: actions/cache@v3
+        with:
+          path: $HOME/android-sdk
+          key: android-sdk-${{ runner.os }}-34.0.0
+          restore-keys: |
+            android-sdk-${{ runner.os }}-
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        if: steps.android-sdk-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends wget unzip
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          unzip cmdline-tools.zip -d $HOME/android-sdk/cmdline-tools
+          mv $HOME/android-sdk/cmdline-tools/cmdline-tools $HOME/android-sdk/cmdline-tools/latest
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$ANDROID_SDK_ROOT/build-tools/34.0.0:$PATH
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "build-tools;34.0.0"
+
+      - name: Cache Firebase CLI
+        id: firebase-cli-cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/firebase
+          key: firebase-cli-${{ runner.os }}
+          restore-keys: |
+            firebase-cli-
+
+      - name: Install Firebase CLI
+        if: steps.firebase-cli-cache.outputs.cache-hit != 'true'
+        run: |
+          curl -sL https://firebase.tools | bash
+          mkdir -p ~/.cache/firebase
+          cp $(which firebase) ~/.cache/firebase/
+
+      - name: Add Firebase CLI to PATH
+        run: |
+          export PATH=~/.cache/firebase:$PATH
+
+      - name: Decode and save keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > keystore.jks
+
+      - name: Build APK
+        run: |
+          if [[ "${{ github.ref_name }}" == "dev" ]]; then
+            ./gradlew assembleDevDebug
+          elif [[ "${{ github.ref_name }}" == "uat" ]]; then
+            ./gradlew assembleUatDebug
+          fi
+
+      - name: Sign APK
+        run: |
+          if [[ "${{ github.ref_name }}" == "dev" ]]; then
+            APK_PATH=app/build/outputs/apk/dev/debug/app-dev-debug.apk
+            OUTPUT_PATH=app/build/outputs/apk/dev/debug/dev_debug_signed.apk
+          elif [[ "${{ github.ref_name }}" == "uat" ]]; then
+            APK_PATH=app/build/outputs/apk/uat/debug/app-uat-debug.apk
+            OUTPUT_PATH=app/build/outputs/apk/uat/debug/uat_debug_signed.apk
+          fi
+          $ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner sign --ks keystore.jks \
+          --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
+          --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+          --out $OUTPUT_PATH $APK_PATH
+
+      - name: Align APK
+        run: |
+          $ANDROID_SDK_ROOT/build-tools/34.0.0/zipalign -v -p 4 \
+          app/build/outputs/apk/release/app-release-signed.apk 
+
+      - name: Align APK
+        run: |
+          if [[ "${{ github.ref_name }}" == "dev" ]]; then
+            SIGNED_APK=app/build/outputs/apk/dev/debug/dev_debug_signed.apk
+          elif [[ "${{ github.ref_name }}" == "uat" ]]; then
+            SIGNED_APK=app/build/outputs/apk/uat/debug/uat_debug_signed.apk
+          fi
+          $ANDROID_SDK_ROOT/build-tools/34.0.0/zipalign -v -p 4 $SIGNED_APK
+
+#      - name: Authenticate with Firebase
+#        env:
+#          FIREBASE_AUTH_KEY: ${{ secrets.FIREBASE_AUTH_KEY }}
+#        run: |
+#          echo $FIREBASE_AUTH_KEY > firebase-auth.json
+#          firebase auth:login:ci --token $(cat firebase-auth.json)
+#
+#      - name: Upload APK to Firebase App Distribution
+#        env:
+#          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+#        run: |
+#          if [[ "${{ github.ref_name }}" == "dev" ]]; then
+#            firebase appdistribution:distribute app/build/outputs/apk/dev/debug/dev_debug_signed.apk
+#          else
+#            firebase appdistribution:distribute app/build/outputs/apk/uat/debug/dev_debug_signed.apk.apk
+#          --app $FIREBASE_APP_ID \
+#          --groups "testers" \
+#          --token $(cat firebase-auth.json)
+
+      - name: Upload APK as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ github.ref_name }}_apk
+          path: |
+            app/build/outputs/apk/dev/debug/dev_debug_signed.apk
+            app/build/outputs/apk/uat/debug/dev_debug_signed.apk
